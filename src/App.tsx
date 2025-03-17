@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Drawer from './components/drawer'
 import {
@@ -9,19 +9,32 @@ import {
   useNodesState,
   useEdgesState,
   addEdge,
+  Node,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
+import IconMenu from './components/menu';
 
+interface ContextMenuTypes extends Node {
+  id: string;
+  label: string;
+  borderColor: string;
+  x: number;
+  y: number
+}
 const initialNodes: any[] = [];
-const initialEdges:any[] = [];
+const initialEdges: any[] = [];
 
 
 
 export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true)
+  const [contextMenu, setContextMenu] = useState<{ id: string, label: string, borderColor: string, x: number, y: number } | null>(null)
+  const [droppedNode, setDroppedNode] = useState('')
+
+  const contextMenuRef = useRef<HTMLDivElement|null>(null)
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -37,7 +50,7 @@ export default function App() {
     e.preventDefault()
 
     const data = e.dataTransfer.getData('application/reactflow')
-    const {label,borderColor} = JSON.parse(data)
+    const { nodeId, label, borderColor } = JSON.parse(data)
     if (!data) return
 
     const newNode = {
@@ -46,15 +59,49 @@ export default function App() {
         x: e.clientX - 100,
         y: e.clientY - 50
       },
-      data: { label,borderColor }
+      data: { label, borderColor }
     }
-
+    setDroppedNode(nodeId)
     setNodes((prev) => [...prev, newNode])
+  }
+
+  const onNodeClick = (e: React.MouseEvent, node: Node) => {
+
+  }
+
+  const handleClickOutside = (e: MouseEvent) => {
+    if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as unknown as HTMLElement)) {
+      setContextMenu(null);
+    }
+  };
+
+  useEffect(()=>{
+    document.addEventListener('click',handleClickOutside)
+    return () => document.removeEventListener('click',handleClickOutside)
+  },[])
+
+  const onNodeContextMenu = (e: React.MouseEvent, node: ContextMenuTypes) => {
+    e.preventDefault()
+    const label = node.data.label as string
+    const borderColor = node.data.borderColor as string
+    setContextMenu({
+      id: node.id,
+      label: label,
+      borderColor: borderColor,
+      x: e.clientX,
+      y: e.clientY
+    })
   }
 
   const closeDrawer = (val: boolean) => {
     setIsDrawerOpen(val);
   };
+
+  const handleDelete = () => {
+    const nodeId = contextMenu?.id
+    setNodes((node) => node.filter((node)=>node.id!==nodeId))
+    setContextMenu(null)
+  }
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -65,6 +112,8 @@ export default function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
+        onNodeContextMenu={onNodeContextMenu}
         onDrop={onDrop}
       >
         <Controls />
@@ -72,7 +121,23 @@ export default function App() {
         <Background variant="dots" gap={12} size={1} />
 
       </ReactFlow>
-
+      {contextMenu && (
+        <div
+        ref={contextMenuRef}
+          style={{
+            position: 'absolute',
+            top: contextMenu.y,
+            left: contextMenu.x,
+            background: 'white',
+            border: '1px solid #ccc',
+            padding: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+            zIndex: 1000,
+          }}
+        >
+          <IconMenu onDelete={handleDelete} />
+        </div>
+      )}
       <div
         style={{
           position: "absolute",
@@ -89,7 +154,7 @@ export default function App() {
           <ArrowBackIosIcon fontSize="medium" />
         </button>
       </div>
-      <Drawer trigger={isDrawerOpen} closeDrawer={closeDrawer} />
+      <Drawer trigger={isDrawerOpen} closeDrawer={closeDrawer} nodeToBeRemoved={droppedNode} />
     </div>
   );
 }
