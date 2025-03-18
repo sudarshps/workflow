@@ -80,7 +80,7 @@ console.log('nodd',nodes);
   const onNodeContextMenu = (e: React.MouseEvent, node: ContextMenuTypes) => {
     e.preventDefault()
     const label = node.data.label as string
-    const borderColor = node.data.borderColor as string
+    const borderColor = node.style?.borderColor as string
     setContextMenu({
       id: node.id,
       label: label,

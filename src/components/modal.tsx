@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { useFlow } from '../context/Context';
+import { ColorPicker } from 'primereact/colorpicker';
+
 
 const style = {
   position: 'absolute',
@@ -17,38 +19,44 @@ const style = {
 };
 
 export default function BasicModal({ isOpen, onClose }) {
-  const [nodeLabel,setNodeLabel] = React.useState('')
+  const [nodeLabel, setNodeLabel] = React.useState('')
+  const [border,setBorder] = React.useState('')
   const [open, setOpen] = React.useState(false);
-  const {contextMenu,setNodes,nodes} = useFlow() 
+  // const [color, setColor] = React.useState<string | undefined>(undefined)
+
+  const { contextMenu, setNodes, nodes } = useFlow()
 
   const handleClose = () => {
     setOpen(false);
     onClose(false)
   }
-  console.log('hi',nodes);
-  
+  console.log('hi', nodes);
+
   React.useEffect(() => {
     if (isOpen) {
       setOpen(isOpen)
       setNodeLabel(contextMenu.label)
+      const colorCode = contextMenu.borderColor.slice(1)      
+      setBorder(colorCode)
     }
   }, [isOpen])
 
-  console.log('nid',contextMenu?.id)
+  console.log('nid', contextMenu?.id)
 
   const handleSave = () => {
     setNodes((prevNodes) =>
       prevNodes.map((node) =>
         node.id === contextMenu?.id
-          ? { 
-              ...node, 
-              data: { ...node.data, label: nodeLabel },
-            }
+          ? {
+            ...node,
+            data: { ...node.data, label: nodeLabel },
+            style:{...node.data,borderColor:`#${border}`}
+          }
           : node
       )
     );
-  
-    handleClose(); 
+
+    handleClose();
   };
 
   return (
@@ -63,12 +71,20 @@ export default function BasicModal({ isOpen, onClose }) {
           <Typography id="modal-modal-title" variant="h6" component="h2">
             Edit Node
           </Typography>
-          <div className='flex flex-col'>
-            <label htmlFor="label">Label</label>
-            <input type="text" className='border rounded' value={nodeLabel} onChange={(e)=>setNodeLabel(e.target.value)}/>
+          <div className='space-y-4'>
+            <div className='flex flex-col'>
+              <label htmlFor="label">Label:</label>
+              <input type="text" className='border rounded' value={nodeLabel} onChange={(e) => setNodeLabel(e.target.value)} />
+            </div>
+            <div className='flex gap-4 items-center'>
+              <label htmlFor="label">Background Color:</label>
+              <ColorPicker appendTo='self' value={border} onChange={(e) => setBorder(e.value?.toString() || '#000000')} />
+
+            </div>
           </div>
-          <div className='flex justify-end'>
-            <button onClick={handleSave} className='bg-blue-500 rounded px-4 py-2 hover:cursor-pointer hover:bg-blue-600'>Save</button>
+
+          <div className='flex justify-end p-4'>
+            <button onClick={handleSave} className='text-white bg-blue-500 rounded px-4 py-2 hover:cursor-pointer hover:bg-blue-600'>Save</button>
 
           </div>
         </Box>

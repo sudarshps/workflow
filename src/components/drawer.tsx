@@ -23,8 +23,8 @@ export default function AnchorTemporaryDrawer({ trigger, closeDrawer, nodeToBeRe
 
   const [addNodeLabel, setAddNodeLabel] = React.useState('')
   const [color, setColor] = React.useState<string | undefined>(undefined)
-  const [nodes, setNodes] = React.useState([{ id: "node-1", label: "Start", borderColor: '#3b82f6' },
-  { id: "node-2", label: "Process", borderColor: '#10b981' },
+  const [nodes, setNodes] = React.useState([{ id: "node-1", label: "Start", borderColor: '#FFA500' },
+  { id: "node-2", label: "Process", borderColor: '#0000FF' },
   { id: "node-3", label: "Decision", borderColor: '#10b981' },])
 
   const setNewNode = () => {
