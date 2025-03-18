@@ -14,6 +14,7 @@ import '@xyflow/react/dist/style.css';
 import IconMenu from './components/menu';
 import BasicModal from './components/modal';
 import { useFlow } from './context/Context';
+import BasicSpeedDial from './components/speedDial';
 
 interface ContextMenuTypes extends Node {
   id: string;
@@ -38,7 +39,6 @@ export default function App() {
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
-console.log('nodd',nodes);
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -158,6 +158,7 @@ console.log('nodd',nodes);
         </button>
       </div>
       <Drawer trigger={isDrawerOpen} closeDrawer={closeDrawer} nodeToBeRemoved={droppedNode} />
+      <BasicSpeedDial/>
     </div>
   );
 }

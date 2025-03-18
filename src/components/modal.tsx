@@ -30,7 +30,6 @@ export default function BasicModal({ isOpen, onClose }) {
     setOpen(false);
     onClose(false)
   }
-  console.log('hi', nodes);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -40,8 +39,6 @@ export default function BasicModal({ isOpen, onClose }) {
       setBorder(colorCode)
     }
   }, [isOpen])
-
-  console.log('nid', contextMenu?.id)
 
   const handleSave = () => {
     setNodes((prevNodes) =>

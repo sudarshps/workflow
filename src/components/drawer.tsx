@@ -28,7 +28,6 @@ export default function AnchorTemporaryDrawer({ trigger, closeDrawer, nodeToBeRe
   { id: "node-3", label: "Decision", borderColor: '#10b981' },])
 
   const setNewNode = () => {
-    console.log('col',color);
     
     if (addNodeLabel.trim()) {
       const label = addNodeLabel as string

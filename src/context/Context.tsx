@@ -20,6 +20,8 @@ interface ContextType {
     onEdgesChange: (changes: any) => void
     contextMenu: ContextMenuTypes | null
     setContextMenu: React.Dispatch<React.SetStateAction<{ id: string; label: string; borderColor: string; x: number; y: number } | null>>
+    saveToLocalStorage:()=>void
+    loadFromLocalStorage:()=>void
 }
 
 const Context = createContext<ContextType | undefined>(undefined)
@@ -47,10 +49,28 @@ export const Provider = ({ children }) => {
         sessionStorage.setItem('edges', JSON.stringify(edges))
     }, [edges])
     
+    const saveToLocalStorage = () => {
+        localStorage.setItem('nodes', JSON.stringify(nodes))
+        localStorage.setItem('edges', JSON.stringify(edges))
+        alert('Workflow saved!')
+    }
 
+    const loadFromLocalStorage = () => {
+        const savedNodes = JSON.parse(localStorage.getItem('nodes') || '[]');
+        const savedEdges = JSON.parse(localStorage.getItem('edges') || '[]');
+      
+        if (savedNodes.length > 0) {
+          setNodes(savedNodes);
+          setEdges(savedEdges);
+          alert('Workflow loaded!');
+        } else {
+          alert('No saved data found!');
+        }
+      }
+      
 
     return (
-        <Context.Provider value={{ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, contextMenu, setContextMenu }}>
+        <Context.Provider value={{ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, contextMenu, setContextMenu,saveToLocalStorage,loadFromLocalStorage }}>
             {children}
         </Context.Provider>
     )
