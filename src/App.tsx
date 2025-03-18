@@ -14,6 +14,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 import IconMenu from './components/menu';
+import BasicModal from './components/modal';
 
 interface ContextMenuTypes extends Node {
   id: string;
@@ -33,8 +34,9 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true)
   const [contextMenu, setContextMenu] = useState<{ id: string, label: string, borderColor: string, x: number, y: number } | null>(null)
   const [droppedNode, setDroppedNode] = useState('')
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
 
-  const contextMenuRef = useRef<HTMLDivElement|null>(null)
+  const contextMenuRef = useRef<HTMLDivElement | null>(null)
 
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -75,10 +77,10 @@ export default function App() {
     }
   };
 
-  useEffect(()=>{
-    document.addEventListener('click',handleClickOutside)
-    return () => document.removeEventListener('click',handleClickOutside)
-  },[])
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
 
   const onNodeContextMenu = (e: React.MouseEvent, node: ContextMenuTypes) => {
     e.preventDefault()
@@ -99,8 +101,13 @@ export default function App() {
 
   const handleDelete = () => {
     const nodeId = contextMenu?.id
-    setNodes((node) => node.filter((node)=>node.id!==nodeId))
+    setNodes((node) => node.filter((node) => node.id !== nodeId))
     setContextMenu(null)
+  }
+
+  const handleEdit = () => {
+    setEditModalOpen(true)
+
   }
 
   return (
@@ -121,9 +128,10 @@ export default function App() {
         <Background variant="dots" gap={12} size={1} />
 
       </ReactFlow>
+      {editModalOpen && (<BasicModal node={contextMenu} isOpen={editModalOpen} onClose={(val: boolean) => setEditModalOpen(val)} />)}
       {contextMenu && (
         <div
-        ref={contextMenuRef}
+          ref={contextMenuRef}
           style={{
             position: 'absolute',
             top: contextMenu.y,
@@ -135,7 +143,7 @@ export default function App() {
             zIndex: 1000,
           }}
         >
-          <IconMenu onDelete={handleDelete} />
+          <IconMenu onDelete={handleDelete} onEdit={handleEdit} />
         </div>
       )}
       <div
