@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
+import { useFlow } from '../context/Context';
 
 const style = {
   position: 'absolute',
@@ -16,24 +16,43 @@ const style = {
   p: 4,
 };
 
-export default function BasicModal({ node, isOpen, onClose }) {
+export default function BasicModal({ isOpen, onClose }) {
+  const [nodeLabel,setNodeLabel] = React.useState('')
   const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
+  const {contextMenu,setNodes,nodes} = useFlow() 
+
   const handleClose = () => {
     setOpen(false);
     onClose(false)
   }
-  console.log('hi',node);
+  console.log('hi',nodes);
   
   React.useEffect(() => {
     if (isOpen) {
       setOpen(isOpen)
+      setNodeLabel(contextMenu.label)
     }
   }, [isOpen])
 
+  console.log('nid',contextMenu?.id)
+
+  const handleSave = () => {
+    setNodes((prevNodes) =>
+      prevNodes.map((node) =>
+        node.id === contextMenu?.id
+          ? { 
+              ...node, 
+              data: { ...node.data, label: nodeLabel },
+            }
+          : node
+      )
+    );
+  
+    handleClose(); 
+  };
+
   return (
     <div>
-      {/* <Button onClick={handleOpen}>Open modal</Button> */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -46,10 +65,10 @@ export default function BasicModal({ node, isOpen, onClose }) {
           </Typography>
           <div className='flex flex-col'>
             <label htmlFor="label">Label</label>
-            <input type="text" className='border rounded' />
+            <input type="text" className='border rounded' value={nodeLabel} onChange={(e)=>setNodeLabel(e.target.value)}/>
           </div>
           <div className='flex justify-end'>
-            <button className='bg-blue-500 rounded px-4 py-2 hover:cursor-pointer hover:bg-blue-600'>Save</button>
+            <button onClick={handleSave} className='bg-blue-500 rounded px-4 py-2 hover:cursor-pointer hover:bg-blue-600'>Save</button>
 
           </div>
         </Box>

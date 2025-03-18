@@ -4,6 +4,7 @@ import Drawer from '@mui/material/Drawer';
 import { ToastContainer, toast } from 'react-toastify';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ColorPicker } from 'primereact/colorpicker';
 type Anchor = 'top' | 'left' | 'bottom' | 'right';
 
 interface DrawerProps {
@@ -21,19 +22,20 @@ export default function AnchorTemporaryDrawer({ trigger, closeDrawer, nodeToBeRe
   })
 
   const [addNodeLabel, setAddNodeLabel] = React.useState('')
-
-  const [nodes, setNodes] = React.useState([{ id: "node-1", label: "Start", borderColor: 'border-indigo-500' },
-  { id: "node-2", label: "Process", borderColor: 'border-yellow-500' },
-  { id: "node-3", label: "Decision", borderColor: 'border-green-500' },])
+  const [color, setColor] = React.useState<string | undefined>(undefined)
+  const [nodes, setNodes] = React.useState([{ id: "node-1", label: "Start", borderColor: '#3b82f6' },
+  { id: "node-2", label: "Process", borderColor: '#10b981' },
+  { id: "node-3", label: "Decision", borderColor: '#10b981' },])
 
   const setNewNode = () => {
-
+    console.log('col',color);
+    
     if (addNodeLabel.trim()) {
       const label = addNodeLabel as string
       const data = {
         id: `${nodes.length + 1}`,
         label,
-        borderColor: 'border-gray-500'
+        borderColor: `#${color}`
       }
       setNodes((prev) => [...prev, data])
       setAddNodeLabel('')
@@ -94,6 +96,11 @@ export default function AnchorTemporaryDrawer({ trigger, closeDrawer, nodeToBeRe
           value={addNodeLabel}
           onChange={(e) => setAddNodeLabel(e.target.value)}
         />
+        <div className='flex items-center justify-center gap-4'>
+          <p>Border Color:</p>
+        <ColorPicker appendTo='self' value={color || '#000000'} onChange={(e) => setColor(e.value?.toString()||'#000000')} />
+
+        </div>
         <button onClick={setNewNode} className="bg-blue-500 w-full max-w-sm hover:cursor-pointer hover:bg-blue-600 text-white px-4 py-2 rounded-md">Add</button>
       </div>
 
@@ -104,7 +111,7 @@ export default function AnchorTemporaryDrawer({ trigger, closeDrawer, nodeToBeRe
         {
           nodes.map((node) => (
             <div className='flex w-full items-center justify-center space-x-2'>
-              <div key={node.id} draggable onDragStart={(e) => handleDragStart(e, node.id, node.label, node.borderColor)} className={`text-center p-2 border ${node.borderColor} w-full rounded-md cursor-grab`}>
+              <div key={node.id} draggable onDragStart={(e) => handleDragStart(e, node.id, node.label, node.borderColor)} style={{ borderColor: `${node.borderColor}` }} className={`text-center p-2 border w-full rounded-md cursor-grab`}>
                 {node.label}
               </div>
               <button onClick={() => deleteNode(node.id)}><DeleteIcon className='text-red-500 hover:cursor-pointer' /></button>

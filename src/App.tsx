@@ -6,8 +6,6 @@ import {
   MiniMap,
   Controls,
   Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
   Node,
 } from '@xyflow/react';
@@ -15,6 +13,7 @@ import {
 import '@xyflow/react/dist/style.css';
 import IconMenu from './components/menu';
 import BasicModal from './components/modal';
+import { useFlow } from './context/Context';
 
 interface ContextMenuTypes extends Node {
   id: string;
@@ -23,16 +22,13 @@ interface ContextMenuTypes extends Node {
   x: number;
   y: number
 }
-const initialNodes: any[] = [];
-const initialEdges: any[] = [];
 
 
 
 export default function App() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const {nodes,edges,setNodes,setEdges,onNodesChange,onEdgesChange,contextMenu,setContextMenu} = useFlow()
   const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-  const [contextMenu, setContextMenu] = useState<{ id: string, label: string, borderColor: string, x: number, y: number } | null>(null)
+  const [isMenuopen,setisMenuOpen] = useState<boolean>(false)
   const [droppedNode, setDroppedNode] = useState('')
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
 
@@ -42,6 +38,7 @@ export default function App() {
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
+console.log('nodd',nodes);
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -56,24 +53,22 @@ export default function App() {
     if (!data) return
 
     const newNode = {
-      id: `${nodes.length + 1}`,
+      id
+      : `${nodes.length + 1}`,
       position: {
         x: e.clientX - 100,
         y: e.clientY - 50
       },
-      data: { label, borderColor }
+      data: { label },
+      style:{borderColor:`${borderColor}`}
     }
     setDroppedNode(nodeId)
-    setNodes((prev) => [...prev, newNode])
-  }
-
-  const onNodeClick = (e: React.MouseEvent, node: Node) => {
-
+    setNodes((prev:ContextMenuTypes[]) => [...prev, newNode])
   }
 
   const handleClickOutside = (e: MouseEvent) => {
     if (contextMenuRef.current && !contextMenuRef.current.contains(e.target as unknown as HTMLElement)) {
-      setContextMenu(null);
+      setisMenuOpen(false)
     }
   };
 
@@ -93,6 +88,7 @@ export default function App() {
       x: e.clientX,
       y: e.clientY
     })
+    setisMenuOpen(true)
   }
 
   const closeDrawer = (val: boolean) => {
@@ -119,7 +115,6 @@ export default function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onDragOver={onDragOver}
-        onNodeClick={onNodeClick}
         onNodeContextMenu={onNodeContextMenu}
         onDrop={onDrop}
       >
@@ -128,14 +123,14 @@ export default function App() {
         <Background variant="dots" gap={12} size={1} />
 
       </ReactFlow>
-      {editModalOpen && (<BasicModal node={contextMenu} isOpen={editModalOpen} onClose={(val: boolean) => setEditModalOpen(val)} />)}
-      {contextMenu && (
+      {editModalOpen && (<BasicModal isOpen={editModalOpen} onClose={(val: boolean) => setEditModalOpen(val)} />)}
+      {isMenuopen && (
         <div
           ref={contextMenuRef}
           style={{
             position: 'absolute',
-            top: contextMenu.y,
-            left: contextMenu.x,
+            top: contextMenu?.y,
+            left: contextMenu?.x,
             background: 'white',
             border: '1px solid #ccc',
             padding: '8px',
