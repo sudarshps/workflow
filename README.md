@@ -1,54 +1,37 @@
-# React + TypeScript + Vite
+# Workflow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Steps to Run the Application Locally
 
-## Expanding the ESLint configuration
+1. **Clone the repository**
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+   First, clone the repository to your local machine using the following command:
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+   ```bash
+   git clone https://github.com/sudarshps/workflow.git
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. **Navigate to the project folder**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+   cd workflow
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+3. **Install dependencies**
+
+   npm install
+
+4. **Run the development server**
+
+   npm run dev
+
+
+
+## Flow of Applicaiton and Functionalities
+
+1. Drag and Drop Nodes: Users can drag and drop nodes from the side palette onto the canvas.
+2. Connect Nodes: Users can connect edges between nodes by drawing links between them.
+3. Add New Nodes: Users can add a new node from the 'Add Node' section and choose a border color for it.
+4. Node List: The added node will appear in the 'Node List' for easy reference and management.
+5. Delete Nodes: There will be a delete button to remove nodes from the canvas.
+6. Edit Node: Users can right-click on any dropped node on the canvas to edit its label and border color.
+7. Save and Load Workflow: Users can save the current state of the workflow by clicking the save button in the Speed Dial icon at the bottom left corner. They can also load a previously saved workflow.
+
