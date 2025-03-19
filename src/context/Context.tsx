@@ -1,4 +1,4 @@
-import React, { useEffect,createContext, useContext, useState } from 'react'
+import React, { useEffect, createContext, useContext, useState } from 'react'
 import { useNodesState, useEdgesState, Node, Edge } from '@xyflow/react'
 
 
@@ -20,8 +20,9 @@ interface ContextType {
     onEdgesChange: (changes: any) => void
     contextMenu: ContextMenuTypes | null
     setContextMenu: React.Dispatch<React.SetStateAction<{ id: string; label: string; borderColor: string; x: number; y: number } | null>>
-    saveToLocalStorage:()=>void
-    loadFromLocalStorage:()=>void
+    saveToLocalStorage: () => void
+    loadFromLocalStorage: () => void
+    resetAutoSave: () => void
 }
 
 const Context = createContext<ContextType | undefined>(undefined)
@@ -32,7 +33,7 @@ export const useFlow = () => {
 }
 
 
-export const Provider = ({ children }) => {
+export const Provider = ({ children }: { children: React.ReactNode }) => {
     const initialNodes: ContextMenuTypes[] = JSON.parse(sessionStorage.getItem('nodes') || '[]')
     const initialEdges: Edge[] = JSON.parse(sessionStorage.getItem('edges') || '[]')
 
@@ -44,11 +45,14 @@ export const Provider = ({ children }) => {
     useEffect(() => {
         sessionStorage.setItem('nodes', JSON.stringify(nodes))
     }, [nodes])
-    
+
     useEffect(() => {
         sessionStorage.setItem('edges', JSON.stringify(edges))
     }, [edges])
-    
+
+
+
+
     const saveToLocalStorage = () => {
         localStorage.setItem('nodes', JSON.stringify(nodes))
         localStorage.setItem('edges', JSON.stringify(edges))
@@ -58,19 +62,19 @@ export const Provider = ({ children }) => {
     const loadFromLocalStorage = () => {
         const savedNodes = JSON.parse(localStorage.getItem('nodes') || '[]');
         const savedEdges = JSON.parse(localStorage.getItem('edges') || '[]');
-      
+
         if (savedNodes.length > 0) {
-          setNodes(savedNodes);
-          setEdges(savedEdges);
-          alert('Workflow loaded!');
+            setNodes(savedNodes);
+            setEdges(savedEdges);
+            alert('Workflow loaded!');
         } else {
-          alert('No saved data found!');
+            alert('No saved data found!');
         }
-      }
-      
+    }
+
 
     return (
-        <Context.Provider value={{ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, contextMenu, setContextMenu,saveToLocalStorage,loadFromLocalStorage }}>
+        <Context.Provider value={{ nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange, contextMenu, setContextMenu, saveToLocalStorage, loadFromLocalStorage }}>
             {children}
         </Context.Provider>
     )

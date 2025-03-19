@@ -4,11 +4,11 @@ import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
 import SaveIcon from '@mui/icons-material/Save';
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useFlow } from '../context/Context';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 const actions = [
-  { icon: <RestartAltIcon />, name: 'Load' },
+  { icon: <FileUploadIcon />, name: 'Load' },
   { icon: <SaveIcon />, name: 'Save' },
 ];
 
@@ -23,7 +23,7 @@ export default function BasicSpeedDial() {
         }
     }
   return (
-    <Box sx={{position: 'absolute', bottom: 200, left:130,  transform: 'translateZ(0px)', flexGrow: 1 }}>
+    <Box sx={{position: 'absolute', bottom: 250, left:130,  transform: 'translateZ(0px)', flexGrow: 1 }}>
       <SpeedDial
         ariaLabel="SpeedDial basic example"
         sx={{ position: 'absolute', right: 16,zIndex:3000 }}

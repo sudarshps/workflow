@@ -8,6 +8,8 @@ import {
   Background,
   addEdge,
   Node,
+  Connection,
+  BackgroundVariant,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -18,25 +20,40 @@ import BasicSpeedDial from './components/speedDial';
 
 interface ContextMenuTypes extends Node {
   id: string;
-  label: string;
-  borderColor: string;
-  x: number;
-  y: number
+  position: {
+    x: number;
+    y: number;
+  };
+  data: {
+    label: string;
+  };
+  style: {
+    borderColor: string;
+  };
 }
 
 
 
 export default function App() {
-  const {nodes,edges,setNodes,setEdges,onNodesChange,onEdgesChange,contextMenu,setContextMenu} = useFlow()
+  const flowContext = useFlow();
+
+  const nodes = flowContext?.nodes;
+  const edges = flowContext?.edges;
+  const setNodes = flowContext?.setNodes;
+  const setEdges = flowContext?.setEdges;
+  const onNodesChange = flowContext?.onNodesChange;
+  const onEdgesChange = flowContext?.onEdgesChange;
+  const contextMenu = flowContext?.contextMenu;
+  const setContextMenu = flowContext?.setContextMenu;
   const [isDrawerOpen, setIsDrawerOpen] = useState(true)
-  const [isMenuopen,setisMenuOpen] = useState<boolean>(false)
+  const [isMenuopen, setisMenuOpen] = useState<boolean>(false)
   const [droppedNode, setDroppedNode] = useState('')
   const [editModalOpen, setEditModalOpen] = useState<boolean>(false)
 
   const contextMenuRef = useRef<HTMLDivElement | null>(null)
 
   const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
+    (params: Connection) => setEdges?.((eds) => addEdge(params, eds)),
     [setEdges],
   );
 
@@ -51,19 +68,20 @@ export default function App() {
     const data = e.dataTransfer.getData('application/reactflow')
     const { nodeId, label, borderColor } = JSON.parse(data)
     if (!data) return
-
-    const newNode = {
-      id
-      : `${nodes.length + 1}`,
-      position: {
-        x: e.clientX - 100,
-        y: e.clientY - 50
-      },
-      data: { label },
-      style:{borderColor:`${borderColor}`}
+    if (nodes) {
+      const newNode = {
+        id
+          : `${nodes.length + 1}`,
+        position: {
+          x: e.clientX - 100,
+          y: e.clientY - 50
+        },
+        data: { label },
+        style: { borderColor: `${borderColor}` }
+      }
+      setDroppedNode(nodeId)
+      setNodes?.((prev:any) => [...prev, newNode])
     }
-    setDroppedNode(nodeId)
-    setNodes((prev:ContextMenuTypes[]) => [...prev, newNode])
   }
 
   const handleClickOutside = (e: MouseEvent) => {
@@ -81,7 +99,7 @@ export default function App() {
     e.preventDefault()
     const label = node.data.label as string
     const borderColor = node.style?.borderColor as string
-    setContextMenu({
+    setContextMenu?.({
       id: node.id,
       label: label,
       borderColor: borderColor,
@@ -97,8 +115,9 @@ export default function App() {
 
   const handleDelete = () => {
     const nodeId = contextMenu?.id
-    setNodes((node) => node.filter((node) => node.id !== nodeId))
-    setContextMenu(null)
+    setNodes?.((node) => node.filter((node) => node.id !== nodeId))
+    setContextMenu?.(null)
+    setisMenuOpen(false)
   }
 
   const handleEdit = () => {
@@ -120,7 +139,7 @@ export default function App() {
       >
         <Controls />
         <MiniMap />
-        <Background variant="dots" gap={12} size={1} />
+        <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
       </ReactFlow>
       {editModalOpen && (<BasicModal isOpen={editModalOpen} onClose={(val: boolean) => setEditModalOpen(val)} />)}
@@ -158,7 +177,7 @@ export default function App() {
         </button>
       </div>
       <Drawer trigger={isDrawerOpen} closeDrawer={closeDrawer} nodeToBeRemoved={droppedNode} />
-      <BasicSpeedDial/>
+      <BasicSpeedDial />
     </div>
   );
 }
